@@ -18,6 +18,8 @@ phpmyadmin爆破工具
   python3 fuckerbak.py
 ```
 
+如果需要修改线程或者爆破延迟，可在 fuckerbak.py main里修改 threadNum 和 timeDelay 参数
+
 相关依赖
 ```bash
 python3 -m pip install requests

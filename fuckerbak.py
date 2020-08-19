@@ -100,7 +100,7 @@ def crack_pma(uname, pwd, token, contentLengthRaw, timeDelay):
 
 if __name__ == '__main__':
     # 线程数量
-    theadNum = 16
+    threadNum = 16
     # 延时 timeDelay s 爆破
     timeDelay = 0
 
@@ -108,7 +108,7 @@ if __name__ == '__main__':
     url = url.replace("\n", "").replace("\r", "").replace("index.php", "")
 
     # 初始化线程池
-    wm = WorkManager(theadNum)
+    wm = WorkManager(threadNum)
 
     for uname in open("username.txt"):
         uname = uname.replace("\r", "").replace("\n", "")
