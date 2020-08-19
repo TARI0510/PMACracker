@@ -22,7 +22,3 @@ phpmyadmin爆破工具
 ```bash
 python3 -m pip install requests
 ```
-
-to-do list
-+ 让用户名初始化时也可以多线程
-
