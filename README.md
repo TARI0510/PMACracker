@@ -10,7 +10,7 @@ phpmyadmin爆破工具
 ```bash
   git clone https://github.com/TARI0510/PMACracker
   cd PMACracker
-  python3 fucker.py
+  python3 fuckerbak.py
 ```
 
 相关依赖
