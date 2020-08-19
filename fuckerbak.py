@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Author: CoolCat
-# @Modified: TARI 增加用户名字典，整理一下自己写代码的习惯
+# @Modified: TARI 增加用户名字典，升级为Python3
 # 脚本功能：暴力破解phpMyadmin密码
 
 import re
