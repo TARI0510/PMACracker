@@ -43,17 +43,18 @@ def init(url):
     :param url: phpmyadmin 的 url 如 localhost:8080 即可
     :return: 登录所需的 token 和 输入错误密码的请求头长度 contentLengthRaw
     """
-    res = requests.get(url, timeout=2)
+    try:
+        res = requests.get(url, timeout=2)
+    except requests.exceptions.MissingSchema:
+        exit('请输入正确的URL')
+
     try:
         assert res.status_code == 200
     except AssertionError:
-        print(res.text)
-        exit(1)
+        exit(res.text)
 
     token = re.findall("name=\"token\" value=\"(.*?)\" /><fieldset>", res.text)
-    token = str(token)
-    token = token.replace("[u\'", "")
-    token = token.replace("\']", "")
+    token = str(token).replace("[u\'", "").replace("\']", "")
     print("[!]Token:" + token)
 
     r = pma_login('root', 'error_password_t3ri', token)
