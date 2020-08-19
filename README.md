@@ -1,15 +1,23 @@
 # PMACracker
+
 phpmyadmin爆破工具
 
-最近盯上了一个站点 除了一个phpmyadmin没找到啥入口 百度找了几个phpmyadmin爆破工具进行测试都用不了 无奈之下就自己造轮子了。
+原作者：https://github.com/TheKingOfDuck/PMACracker
 
-python有问题也容易改 勿喷。
+在此基础上了改用Python3、增加了用户名字典、增加多线程功能
 
 使用说明: 
 ```bash
-  git clone https://github.com/TheKingOfDuck/PMACracker.git
+  git clone https://github.com/TARI0510/PMACracker
   cd PMACracker
-  python fucker.py
+  python3 fucker.py
 ```
 
+相关依赖
+```bash
+python3 -m pip install requests
+```
+
+to-do list
++ 让用户名初始化时也可以多线程
 

