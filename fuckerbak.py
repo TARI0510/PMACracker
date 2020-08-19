@@ -40,8 +40,10 @@ for uname in open("username.txt"):
                 session.post(url, data=fucker)
                 url2 = url + '/index.php?target=url.php&token=' + token
                 r = session.get(url=url2, timeout=2)
-            except:
+            except Exception as e:
+                print(e)
                 print("[!] 在验证账号:" + str(uname) + "密码:" + str(pwd) + " 时发生未知错误")
+                continue
             # 第一次访问, 设置初始 http 返回头长度
             if n == 0:
                 contentLengthRaw = len(r.text)
