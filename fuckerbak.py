@@ -1,8 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
-# @Author: CoolCat
-# @Modified: TARI 增加用户名字典，升级为Python3、多线程
-# 脚本功能：暴力破解phpMyadmin密码
+
+"""
+@Author: CoolCat
+@Modified By: TARI 增加用户名字典，升级为Python3、多线程、支持 pma 5.0.2
+脚本功能：暴力破解phpMyadmin密码
+"""
 
 import re
 import time
