@@ -16,7 +16,7 @@ from threads import WorkManager
 
 def pma_login(url, uname, pwd, token):
     """
-    登录 phpmyadmin 的过程
+    登录 pmd 的过程
     :param url: pma 地址
     :param uname: 用户名
     :param pwd: 密码
@@ -43,9 +43,9 @@ def pma_login(url, uname, pwd, token):
 
 def init(url, uname):
     """
-    请求给定的url，获取phpmyadmin的token和输入错误密码的返回 http 头长度
+    请求给定的url，获取 pma 的token和输入错误密码的返回 http 头长度
     :param uname: 用户名，因为用户名长度不一样错误时返回的 http 头长度不一样
-    :param url: phpmyadmin 的 url 如 localhost:8080 即可
+    :param url: pma 的 url 如 localhost:8080 即可
     :return: 登录所需的 token 和 输入错误密码的返回的 http 头长度 contentLengthRaw
     """
     try:
